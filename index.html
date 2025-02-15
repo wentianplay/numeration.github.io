@@ -1,0 +1,174 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>进制转换工具</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        input, select, button {
+            padding: 8px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .error {
+            color: #ff0000;
+            margin-top: 10px;
+        }
+        .charset-info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>进制转换工具~WenTianPlay</h1>
+        <div class="input-group">
+            <input type="text" id="inputNumber" placeholder="输入数值">
+            <select id="fromBase">
+                <option value="2">二进制 (2)</option>
+                <option value="4">四进制 (4)</option>
+                <option value="8">八进制 (8)</option>
+                <option value="10" selected>十进制 (10)</option>
+                <option value="12">十二进制 (12)</option>
+                <option value="16">十六进制 (16)</option>
+                <option value="32">三十二进制 (32)</option>
+                <option value="64">六十四进制 (64)</option>
+            </select>
+            →
+            <select id="toBase">
+                <option value="2">二进制 (2)</option>
+                <option value="4">四进制 (4)</option>
+                <option value="8">八进制 (8)</option>
+                <option value="10">十进制 (10)</option>
+                <option value="12">十二进制 (12)</option>
+                <option value="16" selected>十六进制 (16)</option>
+                <option value="32">三十二进制 (32)</option>
+                <option value="64">六十四进制 (64)</option>
+            </select>
+            <button onclick="convert()">转换</button>
+        </div>
+        <div id="result"></div>
+        <div id="error" class="error"></div>
+        
+        <div class="charset-info">
+            <h3>各进制字符集说明</h3>
+            <div id="charsetList"></div>
+        </div>
+    </div>
+
+    <script>
+        const charsets = {
+            2: { chars: '01', desc: '0-1' },
+            4: { chars: '0123', desc: '0-3' },
+            8: { chars: '01234567', desc: '0-7' },
+            10: { chars: '0123456789', desc: '0-9' },
+            12: { chars: '0123456789AB', desc: '0-9, A-B' },
+            16: { chars: '0123456789ABCDEF', desc: '0-9, A-F' },
+            32: { chars: '0123456789ABCDEFGHIJKLMNOPQRSTUV', desc: '0-9, A-V' },
+            64: { chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/', 
+                  desc: 'A-Z, a-z, 0-9, +, /' }
+        };
+
+        // 初始化字符集说明
+        function initCharsetInfo() {
+            const container = document.getElementById('charsetList');
+            container.innerHTML = '';
+            for (const base in charsets) {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${base}进制:</strong> ${charsets[base].desc}`;
+                container.appendChild(div);
+            }
+        }
+        initCharsetInfo();
+
+        function convert() {
+            const input = document.getElementById('inputNumber').value.trim();
+            const fromBase = parseInt(document.getElementById('fromBase').value);
+            const toBase = parseInt(document.getElementById('toBase').value);
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+            
+            errorDiv.textContent = '';
+            resultDiv.textContent = '';
+
+            try {
+                validateInput(input, fromBase);
+                const decimal = convertToDecimal(input, fromBase);
+                const result = convertFromDecimal(decimal, toBase);
+                resultDiv.textContent = `转换结果：${result}`;
+            } catch (error) {
+                errorDiv.textContent = '错误：' + error.message;
+            }
+        }
+
+        function validateInput(input, base) {
+            if (!input) throw new Error('输入不能为空');
+            
+            const validChars = charsets[base].chars;
+            const pattern = new RegExp(`^[${validChars}]+(\\.[${validChars}]+)?$`, 'i');
+            if (!pattern.test(input)) {
+                throw new Error(`无效输入，${base}进制允许的字符：${charsets[base].desc}`);
+            }
+        }
+
+        function convertToDecimal(input, base) {
+            const [integerPart, decimalPart] = input.split('.');
+            let decimal = parseInt(integerPart, base);
+            
+            if (decimalPart) {
+                const fraction = decimalPart.split('').reduce((acc, char, index) => {
+                    const value = parseInt(char, base);
+                    return acc + value / Math.pow(base, index + 1);
+                }, 0);
+                decimal += fraction;
+            }
+            return decimal;
+        }
+
+        function convertFromDecimal(decimal, base) {
+            if (base === 10) return decimal.toString();
+            
+            const integer = Math.floor(decimal);
+            let fraction = decimal - integer;
+            
+            // 转换整数部分
+            let intResult = integer.toString(base).toUpperCase();
+            
+            // 转换小数部分（最多保留8位）
+            let fracResult = '';
+            if (fraction > 0) {
+                fracResult = '.';
+                for (let i = 0; i < 8; i++) {
+                    fraction *= base;
+                    const digit = Math.floor(fraction);
+                    fracResult += digit.toString(base).toUpperCase();
+                    fraction -= digit;
+                    if (fraction === 0) break;
+                }
+            }
+            
+            return intResult + fracResult;
+        }
+
+        // 增强输入体验：自动转换大写
+        document.getElementById('inputNumber').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
+    </script>
+</body>
+</html>
