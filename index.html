@@ -1,174 +1,216 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-    <title>进制转换工具</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进制转换器-文天玩WenTianPlay 文天玩(天门)网络科技有限公司</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
         .container {
             max-width: 800px;
             margin: 0 auto;
+            background-color: white;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .input-group {
-            margin: 20px 0;
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .converter {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         input, select, button {
             padding: 8px;
-            margin: 5px;
             font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #45a049;
         }
         #result {
-            margin-top: 20px;
-            padding: 15px;
-            border: 2px solid #4CAF50;
-            border-radius: 5px;
-            font-size: 18px;
-        }
-        .error {
-            color: #ff0000;
             margin-top: 10px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
         }
-        .charset-info {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #f5f5f5;
+        #error {
+            margin-top: 10px;
+            color: red;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>进制转换工具~WenTianPlay</h1>
-        <div class="input-group">
-            <input type="text" id="inputNumber" placeholder="输入数值">
-            <select id="fromBase">
-                <option value="2">二进制 (2)</option>
-                <option value="4">四进制 (4)</option>
-                <option value="8">八进制 (8)</option>
-                <option value="10" selected>十进制 (10)</option>
-                <option value="12">十二进制 (12)</option>
-                <option value="16">十六进制 (16)</option>
-                <option value="32">三十二进制 (32)</option>
-                <option value="64">六十四进制 (64)</option>
-            </select>
-            →
-            <select id="toBase">
-                <option value="2">二进制 (2)</option>
-                <option value="4">四进制 (4)</option>
-                <option value="8">八进制 (8)</option>
-                <option value="10">十进制 (10)</option>
-                <option value="12">十二进制 (12)</option>
-                <option value="16" selected>十六进制 (16)</option>
-                <option value="32">三十二进制 (32)</option>
-                <option value="64">六十四进制 (64)</option>
-            </select>
-            <button onclick="convert()">转换</button>
-        </div>
-        <div id="result"></div>
-        <div id="error" class="error"></div>
-        
-        <div class="charset-info">
-            <h3>各进制字符集说明</h3>
-            <div id="charsetList"></div>
+        <h1>进制转换器</h1>
+        <div class="converter">
+            <div class="input-group">
+                <input type="text" id="numberInput" placeholder="输入数字">
+                <select id="sourceBase">
+                    <option value="2">二进制 (2)</option>
+                    <option value="4">四进制 (4)</option>
+                    <option value="6">六进制 (6)</option>
+                    <option value="8">八进制 (8)</option>
+                    <option value="10" selected>十进制 (10)</option>
+                    <option value="12">十二进制 (12)</option>
+                    <option value="14">十四进制 (14)</option>
+                    <option value="16">十六进制 (16)</option>
+                    <option value="24">二十四进制 (24)</option>
+                    <option value="32">三十二进制 (32)</option>
+                    <option value="64">六十四进制 (64)</option>
+                    <option value="128">128进制</option>
+                    <option value="256">256进制</option>
+                    <option value="512">512进制</option>
+                    <option value="1024">1024进制</option>
+                    <option value="2048">2048进制</option>
+                </select>
+                <span>转换为</span>
+                <select id="targetBase">
+                    <option value="2">二进制 (2)</option>
+                    <option value="4">四进制 (4)</option>
+                    <option value="6">六进制 (6)</option>
+                    <option value="8">八进制 (8)</option>
+                    <option value="10">十进制 (10)</option>
+                    <option value="12">十二进制 (12)</option>
+                    <option value="14">十四进制 (14)</option>
+                    <option value="16" selected>十六进制 (16)</option>
+                    <option value="24">二十四进制 (24)</option>
+                    <option value="32">三十二进制 (32)</option>
+                    <option value="64">六十四进制 (64)</option>
+                    <option value="128">128进制</option>
+                    <option value="256">256进制</option>
+                    <option value="512">512进制</option>
+                    <option value="1024">1024进制</option>
+                    <option value="2048">2048进制</option>
+                </select>
+                <button onclick="convert()">转换</button>
+            </div>
+            <div id="result"></div>
+            <div id="error"></div>
         </div>
     </div>
-
     <script>
-        const charsets = {
-            2: { chars: '01', desc: '0-1' },
-            4: { chars: '0123', desc: '0-3' },
-            8: { chars: '01234567', desc: '0-7' },
-            10: { chars: '0123456789', desc: '0-9' },
-            12: { chars: '0123456789AB', desc: '0-9, A-B' },
-            16: { chars: '0123456789ABCDEF', desc: '0-9, A-F' },
-            32: { chars: '0123456789ABCDEFGHIJKLMNOPQRSTUV', desc: '0-9, A-V' },
-            64: { chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/', 
-                  desc: 'A-Z, a-z, 0-9, +, /' }
-        };
+        function getCharset(base) {
+            const baseMap = {
+                2: '01',
+                4: '0123',
+                6: '012345',
+                8: '01234567',
+                10: '0123456789',
+                12: '0123456789AB',
+                14: '0123456789ABCD',
+                16: '0123456789abcdef',
+                24: '0123456789ABCDEFGHIJKLM',
+                32: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
+                64: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+            };
+            
+            if (baseMap[base]) return baseMap[base];
+            if (base <= 10) return '0123456789'.substring(0, base);
+            if (base <= 36) return '0123456789abcdefghijklmnopqrstuvwxyz'.substring(0, base);
+            return null;
+        }
 
-        // 初始化字符集说明
-        function initCharsetInfo() {
-            const container = document.getElementById('charsetList');
-            container.innerHTML = '';
-            for (const base in charsets) {
-                const div = document.createElement('div');
-                div.innerHTML = `<strong>${base}进制:</strong> ${charsets[base].desc}`;
-                container.appendChild(div);
+        function parseInput(inputStr, sourceBase) {
+            const charset = getCharset(sourceBase);
+            inputStr = inputStr.trim();
+            
+            if (charset) {
+                inputStr = sourceBase === 32 ? inputStr.toUpperCase() : inputStr.toLowerCase();
+                if (!/^[-0-9a-zA-Z+/]+$/.test(inputStr)) throw new Error('包含非法字符');
+                
+                let result = BigInt(0);
+                const base = BigInt(sourceBase);
+                
+                for (const char of inputStr) {
+                    const value = BigInt(charset.indexOf(char));
+                    if (value === -1) throw new Error(`无效字符: ${char}`);
+                    result = result * base + value;
+                }
+                return result;
+            } else {
+                const parts = inputStr.split(/[\s,]+/).filter(p => p !== '');
+                if (parts.length === 0) throw new Error('请输入有效数字');
+                
+                const base = BigInt(sourceBase);
+                let result = BigInt(0);
+                
+                for (const part of parts) {
+                    const num = BigInt(part);
+                    if (num >= base) throw new Error(`数字 ${part} 超过进制限制`);
+                    result = result * base + num;
+                }
+                return result;
             }
         }
-        initCharsetInfo();
+
+        function convertToBase(number, targetBase) {
+            const base = BigInt(targetBase);
+            const digits = [];
+            
+            if (number === BigInt(0)) digits.push(0);
+            else {
+                while (number > 0) {
+                    digits.unshift(Number(number % base));
+                    number = number / base;
+                }
+            }
+            return digits;
+        }
+
+        function formatOutput(digits, targetBase) {
+            const charset = getCharset(targetBase);
+            if (charset) return digits.map(d => charset[d]).join('');
+            return digits.join(' ');
+        }
 
         function convert() {
-            const input = document.getElementById('inputNumber').value.trim();
-            const fromBase = parseInt(document.getElementById('fromBase').value);
-            const toBase = parseInt(document.getElementById('toBase').value);
+            const inputStr = document.getElementById('numberInput').value;
+            const sourceBase = parseInt(document.getElementById('sourceBase').value);
+            const targetBase = parseInt(document.getElementById('targetBase').value);
             const resultDiv = document.getElementById('result');
             const errorDiv = document.getElementById('error');
-            
+
             errorDiv.textContent = '';
             resultDiv.textContent = '';
 
             try {
-                validateInput(input, fromBase);
-                const decimal = convertToDecimal(input, fromBase);
-                const result = convertFromDecimal(decimal, toBase);
-                resultDiv.textContent = `转换结果：${result}`;
-            } catch (error) {
-                errorDiv.textContent = '错误：' + error.message;
+                if (!inputStr) throw new Error('请输入要转换的数字');
+                const decimalNumber = parseInput(inputStr, sourceBase);
+                const targetDigits = convertToBase(decimalNumber, targetBase);
+                const result = formatOutput(targetDigits, targetBase);
+                resultDiv.textContent = `转换结果: ${result}`;
+            } catch (e) {
+                errorDiv.textContent = '错误: ' + e.message;
             }
         }
-
-        function validateInput(input, base) {
-            if (!input) throw new Error('输入不能为空');
-            
-            const validChars = charsets[base].chars;
-            const pattern = new RegExp(`^[${validChars}]+(\\.[${validChars}]+)?$`, 'i');
-            if (!pattern.test(input)) {
-                throw new Error(`无效输入，${base}进制允许的字符：${charsets[base].desc}`);
-            }
-        }
-
-        function convertToDecimal(input, base) {
-            const [integerPart, decimalPart] = input.split('.');
-            let decimal = parseInt(integerPart, base);
-            
-            if (decimalPart) {
-                const fraction = decimalPart.split('').reduce((acc, char, index) => {
-                    const value = parseInt(char, base);
-                    return acc + value / Math.pow(base, index + 1);
-                }, 0);
-                decimal += fraction;
-            }
-            return decimal;
-        }
-
-        function convertFromDecimal(decimal, base) {
-            if (base === 10) return decimal.toString();
-            
-            const integer = Math.floor(decimal);
-            let fraction = decimal - integer;
-            
-            // 转换整数部分
-            let intResult = integer.toString(base).toUpperCase();
-            
-            // 转换小数部分（最多保留8位）
-            let fracResult = '';
-            if (fraction > 0) {
-                fracResult = '.';
-                for (let i = 0; i < 8; i++) {
-                    fraction *= base;
-                    const digit = Math.floor(fraction);
-                    fracResult += digit.toString(base).toUpperCase();
-                    fraction -= digit;
-                    if (fraction === 0) break;
-                }
-            }
-            
-            return intResult + fracResult;
-        }
-
-        // 增强输入体验：自动转换大写
-        document.getElementById('inputNumber').addEventListener('input', function(e) {
-            this.value = this.value.toUpperCase();
-        });
     </script>
 </body>
 </html>
